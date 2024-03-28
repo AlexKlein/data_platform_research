@@ -1,0 +1,74 @@
+{
+  "expectation_suite_name": "data_profiler_assistant_suite",
+  "ge_cloud_id": null,
+  "expectations": [
+    {
+      "expectation_type": "expect_table_columns_to_match_set",
+      "kwargs": {
+        "column_set": [
+          "year_month",
+          "label",
+          "movie"
+        ],
+        "exact_match": null
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "label"
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "movie"
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "year_month"
+      }
+    },
+    {
+      "expectation_type": "expect_column_value_lengths_to_be_between",
+      "kwargs": {
+        "strict_max": false,
+        "min_value": 6,
+        "max_value": 7,
+        "mostly": 1.0,
+        "strict_min": false,
+        "column": "year_month"
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": {
+        "mostly": 1.0,
+        "regex": "-?\\d+",
+        "column": "year_month"
+      }
+    },
+    {
+      "expectation_type": "expect_column_unique_value_count_to_be_between",
+      "kwargs": {
+        "strict_max": false,
+        "min_value": 16,
+        "max_value": 16,
+        "strict_min": false,
+        "column": "movie"
+      }
+    }
+  ],
+  "data_asset_type": null,
+  "meta": {
+    "great_expectations_version": "0.18.1",
+    "citations": [
+      {
+        "citation_date": "2024-03-26T22:45:35.562161Z",
+        "comment": "Created by effective Rule-Based Profiler of OnboardingDataAssistant with the configuration included.\n"
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+name: 'movie_rating'
+version: '1.0.0'
+config-version: 2
+
+profile: "{{ 'prod_connection' if env_var('WORKENV')=='prod' else 'dev_connection' }}"
+
+model-paths: ["models"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+clean-targets:
+  - "target"
+  - "dbt/target"
+
+vars:
+    staging_schema:  "{{ env_var('STG_SCHEMA', 'staging') }}"
+    dwh_schema: "{{ env_var('DWH_SCHEMA', 'core_dwh') }}"
+    datamart_rating_schema: "{{ env_var('DM_RATING', 'dm_rating') }}"
+
+models:
+  movie_rating:
+    staging:
+      schema: "{{ env_var('STG_SCHEMA', 'staging') }}"
+    dimensions:
+      schema: "{{ env_var('DWH_SCHEMA', 'core_dwh') }}"
+#      schema: "core_dwh"
+    facts:
+      schema: "{{ env_var('DWH_SCHEMA', 'core_dwh') }}"
+#      schema: "core_dwh"
+    marts:
+      dm_rating:
+        schema: "{{ env_var('DM_RATING', 'dm_rating') }}"

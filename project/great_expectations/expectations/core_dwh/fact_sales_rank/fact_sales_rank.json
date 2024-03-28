@@ -1,0 +1,47 @@
+{
+  "expectation_suite_name": "data_profiler_assistant_suite",
+  "ge_cloud_id": null,
+  "expectations": [
+    {
+      "expectation_type": "expect_table_columns_to_match_set",
+      "kwargs": {
+        "column_set": [
+          "product_asin",
+          "rank",
+          "category_id"
+        ],
+        "exact_match": null
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "product_asin"
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "rank"
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": {
+        "mostly": 1.0,
+        "regex": "-?\\d+",
+        "column": "product_asin"
+      }
+    }
+  ],
+  "data_asset_type": null,
+  "meta": {
+    "great_expectations_version": "0.18.1",
+    "citations": [
+      {
+        "citation_date": "2024-03-26T22:45:24.913379Z",
+        "comment": "Created by effective Rule-Based Profiler of OnboardingDataAssistant with the configuration included.\n"
+      }
+    ]
+  }
+}

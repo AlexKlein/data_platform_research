@@ -1,0 +1,151 @@
+version: '3.8'
+
+x-trg-env: &trg-env
+  POSTGRES_HOST: "my_small_dwh"
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_PORT: 5432
+
+x-airflow-common: &airflow-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment: &airflow-environment
+    AIRFLOW__CORE__REMOTE_LOGGING: 'False'
+    AIRFLOW__CORE__BASE_LOG_FOLDER: '/opt/airflow/logs'
+    AIRFLOW__CORE__DAGS_FOLDER: '/opt/airflow/dags'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__WEBSERVER__BASE_URL: http://localhost:8080
+    HDFS_URI: 'http://namenode:9870'
+    <<: *trg-env
+  env_file:
+    - local.env
+  restart: always
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./airflow/logs:/opt/airflow/logs
+    - ./datahub/datahub-token.json:/etc/service-account/datahub-token.json
+    - ./dbt:/opt/airflow/dbt
+    - ./dbt/profiles.yml:/home/airflow/.dbt
+    - ./great_expectations:/opt/airflow/great_expectations
+    - ./migrations:/opt/airflow/migrations
+
+services:
+  object_store_namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    restart: always
+    ports:
+      - "9870:9870"
+      - "9001:9000"
+    expose:
+      - "9001"
+    volumes:
+      - ./hadoop/namenode:/hadoop/dfs/name
+    environment:
+      CLUSTER_NAME: 'test'
+    env_file:
+      - ./hadoop/hadoop.env
+
+  object_store_datanode_1:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode1
+    restart: always
+    ports:
+      - "9864:9864"
+    volumes:
+      - ./hadoop/datanode1:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: 'namenode:9870'
+    env_file:
+      - ./hadoop/hadoop.env
+
+  object_store_datanode_2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode2
+    restart: always
+    ports:
+      - "9865:9864"
+    volumes:
+      - ./hadoop/datanode2:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: 'namenode:9870'
+    env_file:
+      - ./hadoop/hadoop.env
+
+  my_small_dwh:
+    image: postgres:13
+    container_name: my_small_dwh
+    environment:
+      <<: *trg-env
+    restart: always
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./metabase:/metabase-data
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+      MB_JETTY_PORT: 3000
+    depends_on:
+      - my_small_dwh
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    environment:
+      <<: *airflow-environment
+      AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+      AIRFLOW__CORE__PARALLELISM: 8
+      AIRFLOW__CORE__DAG_CONCURRENCY: 8
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      - postgres
+      - my_small_dwh
+    command: webserver
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    environment:
+      <<: *airflow-environment
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      - airflow-webserver
+    command: scheduler

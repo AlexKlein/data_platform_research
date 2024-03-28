@@ -1,0 +1,10 @@
+- database: postgres
+  schemas:
+    - schema_name: core_dwh
+      tables:
+        - table_name_mask: dim_*
+        - table_name_mask: fact_*
+    - schema_name: dm_rating
+      tables:
+        - table_name_mask: top_bottom_five
+        - table_name_mask: top_five_increased_rating

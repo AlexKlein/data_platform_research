@@ -1,0 +1,24 @@
+dev_connection:
+  outputs:
+    dev:
+      type: postgres
+      threads: 1
+      host: "{{ 'my_small_dwh' if env_var('WORKENV')=='local' else 'my_small_dwh' }}"  # at the moment there is only one instance
+      port: 5432
+      user: postgres
+      pass: postgres
+      dbname: postgres
+      schema: staging
+  target: dev
+prod_connection:
+  outputs:
+    prod:
+      type: postgres
+      threads: 1
+      host: "{{ 'my_small_dwh' if env_var('WORKENV')=='local' else 'my_small_dwh' }}"  # at the moment there is only one instance
+      port: 5432
+      user: postgres
+      pass: postgres
+      dbname: postgres
+      schema: staging
+  target: prod

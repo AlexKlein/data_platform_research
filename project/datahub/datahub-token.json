@@ -1,0 +1,4 @@
+{
+  "datahub_url": "http://localhost:9002/api/gms",
+  "datahub_token": "secret_token"
+}
