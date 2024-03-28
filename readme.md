@@ -136,7 +136,7 @@ In this project Great Expectations is configured to push data validation results
 
 This pushing of the metadata fails because there is no Datahub service in the project but it doesn't fail the whole DAG. I wanted just to configure this ability.
 
-To disable this feature, clear the [action_list](https://github.com/AlexKlein/data_platform_research/blob/master/project/great_expectations/run_expectations_plugin.py#L122) parameter in [context.add_or_update_checkpoint()](https://github.com/AlexKlein/data_platform_research/blob/master/project/great_expectations/run_expectations_plugin.py#L102) within [the plugin](./project/great_expectations/run_expectations_plugin.py).
+To disable this feature, clear the [action_list](https://github.com/AlexKlein/data_platform_research/blob/master/project/great_expectations/run_expectations_plugin.py#L122) parameter in [add_or_update_checkpoint()](https://github.com/AlexKlein/data_platform_research/blob/master/project/great_expectations/run_expectations_plugin.py#L102) within [the plugin](./project/great_expectations/run_expectations_plugin.py).
 
 ### Advantages of Great Expectations and Potential Datahub Integration
 
@@ -146,17 +146,9 @@ Great Expectations is a pivotal component in my data quality framework. It allow
 
 Further you can find examples of Data Quality improvement of using together Great Expectations and Datahub:
 
-- **Visualization of a list of Expectations**
-
-![List of Expectations](./images/list_of_expectations.jpg)
-
-- **Storing of Data Quality Check History**:
-
-![Data Quality Check History](./images/dq_check_history.jpg)
-
-- **Showing data health via Data Lineage**:
-
-![Data Lineage with Failed Checks](./images/data_lineage_with_failed_checks.jpg)
+- Visualization of a list of Expectations
+- Storing of Data Quality Check History
+- Showing data health via Data Lineage
 
 ## Future Enhancements with Streaming Tools
 
